@@ -1,0 +1,44 @@
+﻿@page "{userId}"
+@model MiniAccountManagementSystem.Pages.Admin.Users.ManageModel
+@{
+    ViewData["Title"] = "Manage User Roles";
+}
+
+<h1>Manage Roles for: @Model.UserEmail</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Manage User Roles</h2>
+                    Add/Remove Roles for this user.
+                </div>
+                <div class="card-body">
+                    @* We need a loop to show all the checkboxes *@
+                    @for (int i = 0; i < Model.ManageUserRoles.Count; i++)
+                    {
+                        <div class="form-check m-1">
+                            @* These hidden inputs are important! They ensure that even if a box is unchecked, *@
+                            @* the browser still sends its data back to the server. *@
+                            <input type="hidden" asp-for="@Model.ManageUserRoles[i].RoleId" />
+                            <input type="hidden" asp-for="@Model.ManageUserRoles[i].RoleName" />
+
+                            @* The actual checkbox. asp-for binds it to the "Selected" property. *@
+                            <input asp-for="@Model.ManageUserRoles[i].Selected" class="form-check-input" />
+
+                            <label class="form-check-label" asp-for="@Model.ManageUserRoles[i].Selected">
+                                @Model.ManageUserRoles[i].RoleName
+                            </label>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                    <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
