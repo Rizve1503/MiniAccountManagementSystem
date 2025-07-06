@@ -1,0 +1,51 @@
+CREATE PROCEDURE sp_GetGeneralLedger
+    @StartDate DATE,
+    @EndDate DATE,
+    @ChartOfAccountId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Step 1: Calculate the Opening Balance.
+    -- This is the net balance of the account for all transactions *before* the report's start date.
+    SELECT 
+        ISNULL(SUM(vd.DebitAmount) - SUM(vd.CreditAmount), 0) AS OpeningBalance
+    FROM 
+        dbo.VoucherDetail vd
+    INNER JOIN 
+        dbo.VoucherMaster vm ON vd.VoucherMasterId = vm.Id
+    WHERE 
+        vd.ChartOfAccountId = @ChartOfAccountId AND vm.VoucherDate < @StartDate;
+
+    -- Step 2: Get all transactions within the selected date range.
+    -- We use a CTE (Common Table Expression) to make the query cleaner.
+    WITH LedgerTransactions AS (
+        SELECT
+            vm.VoucherDate,
+            vm.VoucherType,
+            vm.Narration,
+            vd.DebitAmount,
+            vd.CreditAmount
+        FROM 
+            dbo.VoucherDetail vd
+        INNER JOIN 
+            dbo.VoucherMaster vm ON vd.VoucherMasterId = vm.Id
+        WHERE 
+            vd.ChartOfAccountId = @ChartOfAccountId 
+            AND vm.VoucherDate BETWEEN @StartDate AND @EndDate
+    )
+    -- Step 3: Select the final data and calculate the running balance.
+    -- The SUM() OVER() clause is a powerful "window function" that calculates a running total.
+    SELECT
+        VoucherDate,
+        VoucherType,
+        Narration,
+        DebitAmount,
+        CreditAmount,
+        SUM(DebitAmount - CreditAmount) OVER (ORDER BY VoucherDate, Narration ROWS UNBOUNDED PRECEDING) as RunningBalance
+    FROM 
+        LedgerTransactions
+    ORDER BY
+        VoucherDate;
+END
+GO

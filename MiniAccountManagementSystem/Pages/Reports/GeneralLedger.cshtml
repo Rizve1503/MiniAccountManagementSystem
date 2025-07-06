@@ -1,0 +1,89 @@
+﻿@page
+@model MiniAccountManagementSystem.Pages.Reports.GeneralLedgerModel
+@{
+    ViewData["Title"] = "General Ledger";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+@* --- Filter Form --- *@
+<form method="get" class="card p-3 mb-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Account</label>
+                <select asp-for="SelectedAccountId" asp-items="Model.ChartOfAccountList" class="form-control">
+                    <option value="0">-- Select an Account --</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="StartDate"></label>
+            <input asp-for="StartDate" class="form-control" type="date" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="EndDate"></label>
+            <input asp-for="EndDate" class="form-control" type="date" />
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Run Report</button>
+        </div>
+    </div>
+</form>
+
+@* --- Report Display --- *@
+@if (Model.SelectedAccountId > 0)
+{
+    <div class="card">
+        <div class="card-header text-center">
+            <h4>General Ledger</h4>
+            <h5>@Model.SelectedAccountName</h5>
+            <h6>From @Model.StartDate.ToString("dd-MMM-yyyy") To @Model.EndDate.ToString("dd-MMM-yyyy")</h6>
+        </div>
+        <div class="card-body">
+            <table class="table table-sm table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Voucher Type</th>
+                        <th>Narration</th>
+                        <th class="text-end">Debit</th>
+                        <th class="text-end">Credit</th>
+                        <th class="text-end">Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @* Opening Balance Row *@
+                    <tr>
+                        <td colspan="5"><strong>Opening Balance</strong></td>
+                        <td class="text-end"><strong>@Model.OpeningBalance.ToString("N2")</strong></td>
+                    </tr>
+
+                    @* Transaction Rows *@
+                    @{
+                        var currentBalance = Model.OpeningBalance;
+                    }
+                    @foreach (var entry in Model.LedgerEntries)
+                    {
+                        currentBalance += entry.DebitAmount - entry.CreditAmount;
+                        <tr>
+                            <td>@entry.VoucherDate.ToString("dd-MMM-yyyy")</td>
+                            <td>@entry.VoucherType</td>
+                            <td>@entry.Narration</td>
+                            <td class="text-end">@entry.DebitAmount.ToString("N2")</td>
+                            <td class="text-end">@entry.CreditAmount.ToString("N2")</td>
+                            <td class="text-end">@currentBalance.ToString("N2")</td>
+                        </tr>
+                    }
+
+                    @* Closing Balance Row *@
+                    <tr class="fw-bold table-light">
+                        <td colspan="5" class="text-end"><strong>Closing Balance</strong></td>
+                        <td class="text-end"><strong>@currentBalance.ToString("N2")</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
