@@ -1,0 +1,23 @@
+﻿@page "{id:int}"
+@model MiniAccountManagementSystem.Pages.Admin.Configuration.Banks.EditBankModel
+@{
+    ViewData["Title"] = "Edit Bank";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <input type="hidden" asp-for="BankToEdit.Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group mb-3">
+                <label asp-for="BankToEdit.BankName"></label>
+                <input asp-for="BankToEdit.BankName" class="form-control" />
+                <span asp-validation-for="BankToEdit.BankName" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>

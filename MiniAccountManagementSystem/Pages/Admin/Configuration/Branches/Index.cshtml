@@ -1,0 +1,55 @@
+﻿@page
+@model MiniAccountManagementSystem.Pages.Admin.Configuration.Branches.IndexModel
+@{
+    ViewData["Title"] = "Manage Branches";
+}
+
+<h1>@ViewData["Title"]</h1>
+<p>
+    <a asp-page="./CreateBranch" class="btn btn-primary">Add New Branch</a>
+    <a asp-page="../BranchTypes/Index" class="btn btn-secondary">Manage Branch Types</a>
+</p>
+
+<div class="accordion" id="bankAccordion">
+    @foreach (var bank in Model.BankTree)
+    {
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading-@bank.Id">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@bank.Id" aria-expanded="false" aria-controls="collapse-@bank.Id">
+                    @bank.BankName
+                </button>
+            </h2>
+            <div id="collapse-@bank.Id" class="accordion-collapse collapse" aria-labelledby="heading-@bank.Id" data-bs-parent="#bankAccordion">
+                <div class="accordion-body">
+                    <table class="table table-sm table-hover">
+                        <thead><tr><th>Branch</th><th>Account No.</th><th>Type</th><th>Address</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            @if (bank.Branches.Any())
+                            {
+                                @foreach (var branch in bank.Branches)
+                                {
+                                    <tr>
+                                        <td>@branch.BranchName</td>
+                                        <td>@branch.AccountNumber</td>
+                                        <td>@branch.AccountType</td>
+                                        <td>@branch.Address</td>
+                                        <td>
+                                            <form method="post" asp-page-handler="Delete" asp-route-id="@branch.Id" onsubmit="return confirm('Are you sure?');">
+                                                <a asp-page="./EditBranch" asp-route-id="@branch.Id" class="btn btn-info btn-sm">Edit</a>
+                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="5" class="text-muted">No branches added yet.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>

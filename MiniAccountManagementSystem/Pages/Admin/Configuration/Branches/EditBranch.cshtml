@@ -1,0 +1,44 @@
+﻿@page "{id:int}"
+@model MiniAccountManagementSystem.Pages.Admin.Configuration.Branches.EditBranchModel
+@{
+    ViewData["Title"] = "Edit Branch";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <input type="hidden" asp-for="BranchToEdit.Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="BranchToEdit.BankId"></label>
+                <select asp-for="BranchToEdit.BankId" asp-items="Model.ParentBankOptions" class="form-control"></select>
+                <span asp-validation-for="BranchToEdit.BankId" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="BranchToEdit.BranchName"></label>
+                <input asp-for="BranchToEdit.BranchName" class="form-control" />
+                <span asp-validation-for="BranchToEdit.BranchName" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="BranchToEdit.AccountNumber"></label>
+                <input asp-for="BranchToEdit.AccountNumber" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="BranchToEdit.AccountType"></label>
+                <select asp-for="BranchToEdit.AccountType" asp-items="Model.BranchTypeOptions" class="form-control">
+                    <option value="">-- Select Type --</option>
+                </select>
+                <span asp-validation-for="BranchToEdit.AccountType" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="BranchToEdit.Address"></label>
+                <textarea asp-for="BranchToEdit.Address" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>

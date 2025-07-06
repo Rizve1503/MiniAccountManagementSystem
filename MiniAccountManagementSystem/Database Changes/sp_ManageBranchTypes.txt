@@ -1,0 +1,16 @@
+CREATE PROCEDURE sp_ManageBranchTypes
+    @Action NVARCHAR(10),
+    @Id INT = NULL,
+    @TypeName NVARCHAR(100) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF @Action = 'GETALL'
+        SELECT Id, TypeName FROM dbo.BranchTypes ORDER BY TypeName;
+    ELSE IF @Action = 'CREATE'
+        INSERT INTO dbo.BranchTypes (TypeName) VALUES (@TypeName);
+    ELSE IF @Action = 'DELETE'
+        DELETE FROM dbo.BranchTypes WHERE Id = @Id;
+    -- We can skip GETBYID and UPDATE for this simple master data for now.
+END

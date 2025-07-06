@@ -1,0 +1,4 @@
+CREATE TABLE dbo.BranchTypes (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    TypeName NVARCHAR(100) NOT NULL UNIQUE
+);

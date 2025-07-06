@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using MiniAccountManagementSystem.Data;
 
 namespace MiniAccountManagementSystem.Data
 {
@@ -9,5 +10,6 @@ namespace MiniAccountManagementSystem.Data
             : base(options)
         {
         }
+        public DbSet<MiniAccountManagementSystem.Data.Bank> Bank { get; set; } = default!;
     }
 }

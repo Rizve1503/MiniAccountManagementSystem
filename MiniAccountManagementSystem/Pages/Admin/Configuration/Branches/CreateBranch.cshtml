@@ -1,0 +1,54 @@
+﻿@page
+@model MiniAccountManagementSystem.Pages.Admin.Configuration.Branches.CreateBranchModel
+@{
+    ViewData["Title"] = "Create New Branch";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="NewBranch.BankId"></label>
+                @* This tag helper automatically builds the dropdown options from our ParentBankOptions property *@
+                <select asp-for="NewBranch.BankId" asp-items="Model.ParentBankOptions" class="form-control">
+                    <option value="">-- Select Parent Bank --</option>
+                </select>
+                <span asp-validation-for="NewBranch.BankId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="NewBranch.BranchName"></label>
+                <input asp-for="NewBranch.BranchName" class="form-control" />
+                <span asp-validation-for="NewBranch.BranchName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="NewBranch.AccountNumber"></label>
+                <input asp-for="NewBranch.AccountNumber" class="form-control" />
+                <span asp-validation-for="NewBranch.AccountNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="NewBranch.AccountType"></label>
+                <select asp-for="NewBranch.AccountType" asp-items="Model.BranchTypeOptions" class="form-control">
+                    <option value="">-- Select Type --</option>
+                </select>
+                <span asp-validation-for="NewBranch.AccountType" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="NewBranch.Address"></label>
+                <textarea asp-for="NewBranch.Address" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="NewBranch.Address" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Branch</button>
+            <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>

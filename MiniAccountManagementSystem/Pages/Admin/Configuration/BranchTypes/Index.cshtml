@@ -1,0 +1,46 @@
+﻿@page
+@model MiniAccountManagementSystem.Pages.Admin.Configuration.BranchTypes.IndexModel
+@{
+    ViewData["Title"] = "Manage Branch Types";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>@ViewData["Title"]</h1>
+    <div>
+        @* --- THIS IS THE NEW BACK BUTTON --- *@
+        <a asp-page="/Admin/Configuration/Branches/Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Branches
+        </a>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <h4>Existing Types</h4>
+        <table class="table">
+            @foreach (var item in Model.TypeList)
+            {
+                <tr>
+                    <td>@item.TypeName</td>
+                    <td>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@item.Id" onsubmit="return confirm('Are you sure?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+    <div class="col-md-4">
+        <h4>Add New Type</h4>
+        <form method="post" asp-page-handler="Create">
+            <div class="form-group">
+                <label asp-for="NewType.TypeName"></label>
+                <input asp-for="NewType.TypeName" class="form-control" />
+                <span asp-validation-for="NewType.TypeName" class="text-danger"></span>
+            </div>
+            <br />
+            <button type="submit" class="btn btn-primary">Add Type</button>
+        </form>
+    </div>
+</div>

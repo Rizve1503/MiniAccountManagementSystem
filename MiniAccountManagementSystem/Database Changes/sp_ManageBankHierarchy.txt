@@ -1,0 +1,46 @@
+CREATE PROCEDURE sp_ManageBankHierarchy
+    -- Parameters are the same as before...
+    @Action NVARCHAR(20), @BankId INT = NULL, @BankName NVARCHAR(200) = NULL, @BranchId INT = NULL, @BranchName NVARCHAR(200) = NULL, @AccountNumber NVARCHAR(50) = NULL, @AccountType NVARCHAR(100) = NULL, @Address NVARCHAR(500) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- ... All GET actions are the same ...
+    IF @Action = 'GET_HIERARCHY' BEGIN SELECT b.Id AS BankId, b.BankName, bb.Id AS BranchId, bb.BranchName, bb.AccountNumber, bb.AccountType, bb.Address FROM dbo.Banks b LEFT JOIN dbo.BankBranches bb ON b.Id = bb.BankId ORDER BY b.BankName, bb.BranchName; END
+    ELSE IF @Action = 'GET_BANKS' BEGIN SELECT Id, BankName FROM dbo.Banks ORDER BY BankName; END
+    ELSE IF @Action = 'GET_BANK_BY_ID' BEGIN SELECT Id, BankName FROM dbo.Banks WHERE Id = @BankId; END
+    ELSE IF @Action = 'GET_BRANCH_BY_ID' BEGIN SELECT Id, BranchName, AccountNumber, AccountType, Address, BankId FROM dbo.BankBranches WHERE Id = @BranchId; END
+
+    ELSE IF @Action = 'CREATE_BANK'
+    BEGIN
+        -- CHECK FOR DUPLICATES
+        IF EXISTS (SELECT 1 FROM dbo.Banks WHERE BankName = @BankName)
+        BEGIN
+            -- Raise an error that C# can catch
+            RAISERROR ('A bank with this name already exists.', 16, 1);
+            RETURN;
+        END
+        INSERT INTO dbo.Banks (BankName) VALUES (@BankName);
+    END
+
+    -- ... CREATE_BRANCH, UPDATE_BANK, UPDATE_BRANCH actions are the same ...
+    ELSE IF @Action = 'CREATE_BRANCH' BEGIN INSERT INTO dbo.BankBranches (BankId, BranchName, AccountNumber, AccountType, Address) VALUES (@BankId, @BranchName, @AccountNumber, @AccountType, @Address); END
+    ELSE IF @Action = 'UPDATE_BANK' BEGIN UPDATE dbo.Banks SET BankName = @BankName WHERE Id = @BankId; END
+    ELSE IF @Action = 'UPDATE_BRANCH' BEGIN UPDATE dbo.BankBranches SET BranchName = @BranchName, AccountNumber = @AccountNumber, AccountType = @AccountType, Address = @Address, BankId = @BankId WHERE Id = @BranchId; END
+
+    ELSE IF @Action = 'DELETE_BANK'
+    BEGIN
+        -- CHECK FOR EXISTING BRANCHES
+        IF EXISTS (SELECT 1 FROM dbo.BankBranches WHERE BankId = @BankId)
+        BEGIN
+            RAISERROR ('Cannot delete this bank because it has branches linked to it. Please delete the branches first.', 16, 1);
+            RETURN;
+        END
+        DELETE FROM dbo.Banks WHERE Id = @BankId;
+    END
+    ELSE IF @Action = 'DELETE_BRANCH'
+    BEGIN
+        DELETE FROM dbo.BankBranches WHERE Id = @BranchId;
+    END
+END
+GO

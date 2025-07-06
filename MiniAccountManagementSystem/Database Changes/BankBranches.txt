@@ -1,0 +1,11 @@
+CREATE TABLE dbo.BankBranches (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    BranchName NVARCHAR(200) NOT NULL,
+    AccountNumber NVARCHAR(50) NULL,
+    AccountType NVARCHAR(100) NULL, -- (e.g., Salary, Bonus, Savings)
+    
+    -- This is the foreign key that links this branch to a parent bank
+    BankId INT NOT NULL,
+    CONSTRAINT FK_BankBranches_Bank FOREIGN KEY (BankId) REFERENCES dbo.Banks(Id)
+);
+GO
