@@ -1,0 +1,37 @@
+﻿@page
+@model MiniAccountManagementSystem.Pages.Admin.Configuration.CompanyProfileModel
+@{
+    ViewData["Title"] = "Company Profile";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form method="post">
+            @* Show the success message if it exists *@
+            @if (!string.IsNullOrEmpty(Model.StatusMessage))
+            {
+                <div class="alert alert-success" role="alert">
+                    @Model.StatusMessage
+                </div>
+            }
+
+            <div class="form-group mb-3">
+                <label asp-for="Profile.CompanyName"></label>
+                <input asp-for="Profile.CompanyName" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Profile.Address"></label>
+                <textarea asp-for="Profile.Address" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Profile.ContactInfo"></label>
+                <input asp-for="Profile.ContactInfo" class="form-control" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>

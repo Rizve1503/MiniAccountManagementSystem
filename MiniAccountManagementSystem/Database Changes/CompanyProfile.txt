@@ -1,0 +1,14 @@
+-- This script creates the table for the Company Profile.
+CREATE TABLE dbo.CompanyProfile (
+    Id INT PRIMARY KEY DEFAULT 1, -- The primary key is always 1
+    CompanyName NVARCHAR(200) NOT NULL,
+    Address NVARCHAR(500) NULL,
+    ContactInfo NVARCHAR(200) NULL,
+    LogoPath NVARCHAR(MAX) NULL, -- We'll store the path to the logo image file
+    
+    -- This constraint ensures you can never add a second row to this table.
+    CONSTRAINT CK_CompanyProfile_Singleton CHECK (Id = 1) 
+);
+
+-- We insert an empty row to start with, so our "update" logic works immediately.
+INSERT INTO dbo.CompanyProfile (CompanyName) VALUES ('Qtech Solution Limited');

@@ -1,0 +1,33 @@
+CREATE PROCEDURE sp_ManageChartOfAccounts
+    @Action NVARCHAR(10),
+    @Id INT = NULL,
+    @AccountCode NVARCHAR(20) = NULL,
+    @AccountName NVARCHAR(200) = NULL,
+    @AccountType NVARCHAR(50) = NULL,
+    @ParentAccountId INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF @Action = 'CREATE'
+    BEGIN
+        INSERT INTO dbo.ChartOfAccounts (AccountCode, AccountName, AccountType, ParentAccountId)
+        VALUES (@AccountCode, @AccountName, @AccountType, @ParentAccountId);
+    END
+    ELSE IF @Action = 'UPDATE'
+    BEGIN
+        UPDATE dbo.ChartOfAccounts
+        SET 
+            AccountCode = @AccountCode,
+            AccountName = @AccountName,
+            AccountType = @AccountType,
+            ParentAccountId = @ParentAccountId
+        WHERE Id = @Id;
+    END
+    ELSE IF @Action = 'DELETE'
+    BEGIN
+        -- Important: We should add a check here later to prevent deleting 
+        -- accounts with children or transactions. For now, this is simple.
+        DELETE FROM dbo.ChartOfAccounts WHERE Id = @Id;
+    END
+END

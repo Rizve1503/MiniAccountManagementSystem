@@ -1,0 +1,46 @@
+﻿@* This file is our reusable template for rendering one row of the tree. *@
+@* It expects a 'model' which is a ChartOfAccount object. *@
+@model MiniAccountManagementSystem.Data.ChartOfAccount
+
+@{
+    // We need to manually calculate the padding now. Let's assume a starting level of 0.
+    // We'll pass this level value when we call the partial.
+    int level = (int)(ViewData["Level"] ?? 0);
+}
+
+<tr>
+    <td style="padding-left: @(level * 20)px;">
+        @* Use a thicker font for parent accounts to make them stand out *@
+        @if (Model.Children.Any())
+        {
+            <strong>@Model.AccountName</strong>
+        }
+        else
+        {
+            @Model.AccountName
+        }
+    </td>
+    <td>@Model.AccountCode</td>
+    <td>@Model.AccountType</td>
+    <td>
+        @* The actions will link to Edit/Delete pages we will create later *@
+        <a asp-page="./Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-info">Edit</a>
+        <a asp-page="./Delete" asp-route-id="@Model.Id" class="btn btn-sm btn-danger">Delete</a>
+    </td>
+</tr>
+
+@* --- This is the recursive part --- *@
+@* If the current account (node) has any children... *@
+@if (Model.Children.Any())
+{
+    // ...loop through each child and render this same partial view for it.
+    // We pass the child account as the 'model' and increment the 'level' for indentation.
+    foreach (var child in Model.Children.OrderBy(c => c.AccountCode))
+    {
+    // Create a new ViewDataDictionary and set the value for the 'Level' key.
+    // This is safer than the collection initializer as it updates the value if it exists.
+    var viewData = new ViewDataDictionary(ViewData);
+    viewData["Level"] = level + 1;
+
+<partial name="_AccountTreeRow" model="child" view-data="viewData" />    }
+}

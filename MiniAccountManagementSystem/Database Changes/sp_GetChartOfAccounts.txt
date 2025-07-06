@@ -1,0 +1,8 @@
+CREATE PROCEDURE sp_GetChartOfAccounts
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT Id, AccountCode, AccountName, AccountType, ParentAccountId
+    FROM dbo.ChartOfAccounts
+    ORDER BY AccountCode; -- Order them for a predictable display
+END

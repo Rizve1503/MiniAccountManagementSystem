@@ -1,0 +1,31 @@
+CREATE PROCEDURE sp_ManageCompanyProfile
+    -- This procedure takes an action ('GET' or 'SAVE') and the data fields.
+    @Action NVARCHAR(10),
+    @CompanyName NVARCHAR(200) = NULL, -- '= NULL' makes them optional
+    @Address NVARCHAR(500) = NULL,
+    @ContactInfo NVARCHAR(200) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- If the action is 'GET', we simply return the single row of data.
+    IF @Action = 'GET'
+    BEGIN
+        SELECT CompanyName, Address, ContactInfo, LogoPath
+        FROM dbo.CompanyProfile
+        WHERE Id = 1;
+    END
+
+    -- If the action is 'SAVE', we update the existing row.
+    -- Because we inserted a default row, we only ever need to update.
+    IF @Action = 'SAVE'
+    BEGIN
+        UPDATE dbo.CompanyProfile
+        SET 
+            CompanyName = @CompanyName,
+            Address = @Address,
+            ContactInfo = @ContactInfo
+            -- We are not managing the LogoPath from this procedure for now.
+        WHERE Id = 1;
+    END
+END

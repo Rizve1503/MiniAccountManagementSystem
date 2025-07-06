@@ -1,0 +1,27 @@
+CREATE TABLE dbo.ChartOfAccounts (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    AccountCode NVARCHAR(20) NOT NULL UNIQUE,
+    AccountName NVARCHAR(200) NOT NULL,
+    
+    -- This will be a fixed set of types: Asset, Liability, Equity, Income, Expense
+    AccountType NVARCHAR(50) NOT NULL, 
+
+    -- This is the key to our hierarchy. 
+    -- It links to the 'Id' of another account in the same table.
+    -- If it's NULL, it means this is a top-level (root) account.
+    ParentAccountId INT NULL, 
+
+    -- Add a foreign key constraint to ensure data integrity
+    CONSTRAINT FK_ChartOfAccounts_Parent FOREIGN KEY (ParentAccountId) REFERENCES dbo.ChartOfAccounts(Id)
+);
+GO -- This command separates batches of SQL statements
+
+-- Let's insert the main root accounts. These should never be deleted.
+-- These are top-level, so their ParentAccountId is NULL.
+INSERT INTO dbo.ChartOfAccounts (AccountCode, AccountName, AccountType, ParentAccountId) VALUES
+('1000', 'Assets', 'Asset', NULL),
+('2000', 'Liabilities', 'Liability', NULL),
+('3000', 'Equity', 'Equity', NULL),
+('4000', 'Income', 'Income', NULL),
+('5000', 'Expenses', 'Expense', NULL);
+GO

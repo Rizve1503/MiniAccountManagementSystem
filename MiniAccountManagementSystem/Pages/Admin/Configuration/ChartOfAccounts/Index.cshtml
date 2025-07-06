@@ -1,0 +1,74 @@
+﻿@page
+@model MiniAccountManagementSystem.Pages.Admin.Configuration.ChartOfAccounts.IndexModel
+@{
+    ViewData["Title"] = "Chart of Accounts";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+<div class="row">
+    @* Column for displaying the tree *@
+    <div class="col-md-8">
+        <h3>Account List</h3>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Account Name</th>
+                    <th>Code</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rootNode in Model.AccountTree.OrderBy(r => r.AccountCode))
+                {
+                    @*
+            This now calls our partial view for each top-level account.
+            The partial view will then handle rendering all of its own children recursively.
+        *@
+                    <partial name="_AccountTreeRow" model="rootNode" />
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* Column for the creation form *@
+    <div class="col-md-4">
+        <h3>Create New Account</h3>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-2">
+                <label asp-for="NewAccount.AccountName"></label>
+                <input asp-for="NewAccount.AccountName" class="form-control" />
+                <span asp-validation-for="NewAccount.AccountName" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="NewAccount.AccountCode"></label>
+                <input asp-for="NewAccount.AccountCode" class="form-control" />
+                <span asp-validation-for="NewAccount.AccountCode" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="NewAccount.AccountType"></label>
+                <select asp-for="NewAccount.AccountType" class="form-control">
+                    <option value="">-- Select Type --</option>
+                    <option value="Asset">Asset</option>
+                    <option value="Liability">Liability</option>
+                    <option value="Equity">Equity</option>
+                    <option value="Income">Income</option>
+                    <option value="Expense">Expense</option>
+                </select>
+                <span asp-validation-for="NewAccount.AccountType" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="NewAccount.ParentAccountId"></label>
+                <select asp-for="NewAccount.ParentAccountId" asp-items="Model.ParentAccountList" class="form-control">
+                    <option value="">-- Select Parent (optional) --</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create Account</button>
+        </form>
+    </div>
+</div>
