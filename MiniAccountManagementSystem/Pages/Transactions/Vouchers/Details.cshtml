@@ -1,0 +1,83 @@
+﻿@page "{id:int}"
+@model MiniAccountManagementSystem.Pages.Transactions.Vouchers.DetailsModel
+@{
+    ViewData["Title"] = "Voucher Details";
+    var totalDebit = Model.VoucherDetails.Sum(d => d.DebitAmount);
+    var totalCredit = Model.VoucherDetails.Sum(d => d.CreditAmount);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>@ViewData["Title"]</h1>
+    <div>
+        <a asp-page="./Index" class="btn btn-secondary">Back to List</a>
+        @* We can add a print button here later *@
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header text-center">
+        @* We can add Company Name from Company Profile here later *@
+        <h3>@Model.VoucherMaster.VoucherType Voucher</h3>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <strong>Voucher No:</strong> @Model.VoucherMaster.Id <br />
+                <strong>Reference No:</strong> @Model.VoucherMaster.ReferenceNo
+            </div>
+            <div class="col-md-6 text-md-end">
+                <strong>Date:</strong> @Model.VoucherMaster.VoucherDate.ToString("dd MMMM, yyyy")
+            </div>
+        </div>
+
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Account Code</th>
+                    <th>Account Name</th>
+                    <th class="text-end">Debit</th>
+                    <th class="text-end">Credit</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detail in Model.VoucherDetails)
+                {
+                    <tr>
+                        <td>@detail.AccountCode</td>
+                        <td>@detail.AccountName</td>
+                        <td class="text-end">@(detail.DebitAmount > 0 ? detail.DebitAmount.ToString("N2") : "")</td>
+                        <td class="text-end">@(detail.CreditAmount > 0 ? detail.CreditAmount.ToString("N2") : "")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="fw-bold">
+                    <td colspan="2" class="text-end">Total</td>
+                    <td class="text-end">@totalDebit.ToString("N2")</td>
+                    <td class="text-end">@totalCredit.ToString("N2")</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="mt-4">
+            <strong>Narration:</strong>
+            <p>@Model.VoucherMaster.Narration</p>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-4 text-center">
+                <hr />
+                Prepared By <br />
+                <em>@Model.VoucherMaster.CreatedBy</em>
+            </div>
+            <div class="col-4 text-center">
+                <hr />
+                Checked By
+            </div>
+            <div class="col-4 text-center">
+                <hr />
+                Approved By
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+CREATE PROCEDURE sp_GetVoucherList
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- We're selecting all the key fields from the master table.
+    -- Ordering by date descending shows the most recent vouchers first.
+    SELECT 
+        Id, 
+        VoucherDate, 
+        VoucherType, 
+        ReferenceNo, 
+        Narration, 
+        CreatedBy, 
+        CreatedDate
+    FROM 
+        dbo.VoucherMaster
+    ORDER BY 
+        VoucherDate DESC, Id DESC;
+END
+GO

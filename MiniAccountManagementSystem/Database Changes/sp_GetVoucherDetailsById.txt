@@ -1,0 +1,32 @@
+CREATE PROCEDURE sp_GetVoucherDetailsById
+    @VoucherMasterId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- 1. Get the Master record
+    SELECT 
+        Id, VoucherDate, VoucherType, ReferenceNo, Narration, CreatedBy, CreatedDate
+    FROM 
+        dbo.VoucherMaster
+    WHERE 
+        Id = @VoucherMasterId;
+
+    -- 2. Get all associated Detail records, and JOIN to get the Account Name
+    SELECT 
+        vd.Id,
+        vd.ChartOfAccountId,
+        coa.AccountName, -- We get the name from the ChartOfAccounts table
+        coa.AccountCode,
+        vd.DebitAmount,
+        vd.CreditAmount
+    FROM 
+        dbo.VoucherDetail vd
+    INNER JOIN 
+        dbo.ChartOfAccounts coa ON vd.ChartOfAccountId = coa.Id
+    WHERE 
+        vd.VoucherMasterId = @VoucherMasterId
+    ORDER BY
+        vd.Id; -- Order by the detail ID to keep them in the order they were entered
+END
+GO
