@@ -1,0 +1,7 @@
+-- This creates a new data type that is essentially a table structure
+CREATE TYPE dbo.VoucherDetailType AS TABLE (
+    ChartOfAccountId INT NOT NULL,
+    DebitAmount DECIMAL(18, 2) NOT NULL,
+    CreditAmount DECIMAL(18, 2) NOT NULL
+);
+GO

@@ -1,0 +1,47 @@
+CREATE PROCEDURE sp_SaveVoucher
+    -- Parameters for the Master table
+    @VoucherDate DATE,
+    @VoucherType NVARCHAR(50),
+    @ReferenceNo NVARCHAR(100),
+    @Narration NVARCHAR(500),
+    @CreatedBy NVARCHAR(256),
+    
+    -- Our special table-valued parameter for the Detail lines.
+    -- 'READONLY' is required for TVPs.
+    @VoucherDetails dbo.VoucherDetailType READONLY
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Start a transaction. This ensures that either ALL the data is saved, or NONE of it is.
+    -- This prevents creating a "half-saved" voucher if an error occurs.
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        -- 1. Insert into the Master table
+        INSERT INTO dbo.VoucherMaster (VoucherDate, VoucherType, ReferenceNo, Narration, CreatedBy)
+        VALUES (@VoucherDate, @VoucherType, @ReferenceNo, @Narration, @CreatedBy);
+
+        -- 2. Get the ID of the new voucher we just created. This is crucial for linking the details.
+        DECLARE @NewVoucherMasterId INT = SCOPE_IDENTITY();
+
+        -- 3. Insert all the detail lines from our table parameter into the Detail table,
+        --    linking them using the new ID.
+        INSERT INTO dbo.VoucherDetail (VoucherMasterId, ChartOfAccountId, DebitAmount, CreditAmount)
+        SELECT @NewVoucherMasterId, ChartOfAccountId, DebitAmount, CreditAmount
+        FROM @VoucherDetails;
+
+        -- 4. If everything was successful, commit the transaction to make the changes permanent.
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        -- 5. If any error occurred during the 'TRY' block, roll back the entire transaction.
+        --    No data will be saved.
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        -- Optional: You can re-throw the error to let the C# code know something went wrong.
+        THROW;
+    END CATCH
+END
+GO

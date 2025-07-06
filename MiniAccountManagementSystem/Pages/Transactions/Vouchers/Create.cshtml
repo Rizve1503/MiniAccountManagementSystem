@@ -1,0 +1,164 @@
+﻿@page
+@model MiniAccountManagementSystem.Pages.Transactions.Vouchers.CreateModel
+@{
+    ViewData["Title"] = "Create Voucher";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert alert-success">@Model.SuccessMessage</div>
+}
+
+<form method="post">
+    @* --- Master Section --- *@
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="VoucherMaster.VoucherDate"></label>
+                <input asp-for="VoucherMaster.VoucherDate" class="form-control" type="date" />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="VoucherMaster.VoucherType"></label>
+                <select asp-for="VoucherMaster.VoucherType" class="form-control">
+                    <option value="Journal">Journal Voucher</option>
+                    <option value="Payment">Payment Voucher</option>
+                    <option value="Receipt">Receipt Voucher</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="VoucherMaster.ReferenceNo"></label>
+                <input asp-for="VoucherMaster.ReferenceNo" class="form-control" />
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-9">
+            <div class="form-group">
+                <label asp-for="VoucherMaster.Narration"></label>
+                <textarea asp-for="VoucherMaster.Narration" class="form-control" rows="2"></textarea>
+            </div>
+        </div>
+    </div>
+    <hr />
+
+    @* --- Detail Section --- *@
+    <h4>Voucher Details</h4>
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <table class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                <th>Account</th>
+                <th style="width: 15%;">Debit</th>
+                <th style="width: 15%;">Credit</th>
+                <th style="width: 5%;"></th>
+            </tr>
+        </thead>
+        <tbody id="voucher-details-body">
+            @for (int i = 0; i < Model.Details.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <select asp-for="Details[i].ChartOfAccountId" asp-items="Model.ChartOfAccountList" class="form-control">
+                            <option value="0">-- Select Account --</option>
+                        </select>
+                    </td>
+                    <td><input asp-for="Details[i].DebitAmount" class="form-control debit-amount" value="0.00" /></td>
+                    <td><input asp-for="Details[i].CreditAmount" class="form-control credit-amount" value="0.00" /></td>
+                    <td><button type="button" class="btn btn-danger btn-sm remove-row-btn">X</button></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td class="text-end"><strong>Total:</strong></td>
+                <td><input type="text" id="total-debit" class="form-control" readonly /></td>
+                <td><input type="text" id="total-credit" class="form-control" readonly /></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <button type="button" id="add-row-btn" class="btn btn-secondary">Add Row</button>
+    <button type="submit" class="btn btn-primary">Save Voucher</button>
+</form>
+
+@* --- This is a hidden template for our JavaScript to copy --- *@
+<table style="display:none;">
+    <tbody id="template-row">
+        <tr>
+            <td>
+                <select name="Details[#].ChartOfAccountId" class="form-control">
+                    <option value="0">-- Select Account --</option>
+                    @foreach (var item in Model.ChartOfAccountList)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </td>
+            <td><input name="Details[#].DebitAmount" class="form-control debit-amount" value="0.00" /></td>
+            <td><input name="Details[#].CreditAmount" class="form-control credit-amount" value="0.00" /></td>
+            <td><button type="button" class="btn btn-danger btn-sm remove-row-btn">X</button></td>
+        </tr>
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            function updateTotals() {
+                let totalDebit = 0;
+                let totalCredit = 0;
+                $('.debit-amount').each(function () {
+                    totalDebit += parseFloat($(this).val()) || 0;
+                });
+                $('.credit-amount').each(function () {
+                    totalCredit += parseFloat($(this).val()) || 0;
+                });
+                $('#total-debit').val(totalDebit.toFixed(2));
+                $('#total-credit').val(totalCredit.toFixed(2));
+            }
+
+            function updateRowIndices() {
+                $('#voucher-details-body tr').each(function (index) {
+                    $(this).find('select, input').each(function () {
+                        this.name = this.name.replace(/\[\d+\]/, '[' + index + ']');
+                    });
+                });
+            }
+
+            $('#add-row-btn').on('click', function () {
+                let newRow = $('#template-row').html();
+                $('#voucher-details-body').append(newRow);
+                updateRowIndices();
+            });
+
+            // Use event delegation for dynamically added buttons
+            $('#voucher-details-body').on('click', '.remove-row-btn', function () {
+                if ($('#voucher-details-body tr').length > 1) {
+                    $(this).closest('tr').remove();
+                    updateTotals();
+                    updateRowIndices();
+                } else {
+                    alert("You cannot remove the last row.");
+                }
+            });
+
+            // Use event delegation for dynamic amount inputs
+            $('#voucher-details-body').on('change', '.debit-amount, .credit-amount', function() {
+                updateTotals();
+            });
+
+            // Initial calculation
+            updateTotals();
+        });
+    </script>
+}

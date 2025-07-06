@@ -1,0 +1,29 @@
+-- The Master table holds the main info for each voucher
+CREATE TABLE dbo.VoucherMaster (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    VoucherDate DATE NOT NULL,
+    VoucherType NVARCHAR(50) NOT NULL, -- 'Journal', 'Payment', 'Receipt'
+    ReferenceNo NVARCHAR(100) NULL,
+    Narration NVARCHAR(500) NULL,
+    CreatedDate DATETIME DEFAULT GETDATE(),
+    CreatedBy NVARCHAR(256) NULL -- To store the email of the user who created it
+);
+GO
+
+-- The Detail table holds the multiple debit/credit lines for each voucher
+CREATE TABLE dbo.VoucherDetail (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    VoucherMasterId INT NOT NULL,
+    ChartOfAccountId INT NOT NULL,
+    DebitAmount DECIMAL(18, 2) NOT NULL DEFAULT 0,
+    CreditAmount DECIMAL(18, 2) NOT NULL DEFAULT 0,
+
+    -- Link back to the master table. If a master is deleted, its details are deleted too.
+    CONSTRAINT FK_VoucherDetail_VoucherMaster FOREIGN KEY (VoucherMasterId) 
+        REFERENCES dbo.VoucherMaster(Id) ON DELETE CASCADE,
+
+    -- Link to our Chart of Accounts table
+    CONSTRAINT FK_VoucherDetail_ChartOfAccounts FOREIGN KEY (ChartOfAccountId) 
+        REFERENCES dbo.ChartOfAccounts(Id)
+);
+GO
